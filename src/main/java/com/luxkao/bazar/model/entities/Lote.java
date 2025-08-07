@@ -1,0 +1,26 @@
+package com.luxkao.bazar.model.entities;
+
+import java.util.Date;
+import java.util.List;
+
+public class Lote {
+    private int id;
+    private Date dataEntrega;
+    private String observacao;
+    private OrgaoFiscalizador orgaoFiscalizador;
+    private OrgaoDonatario orgaoDonatario;
+    private List<Produto> produtos;
+
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public Date getDataEntrega() { return dataEntrega; }
+    public void setDataEntrega(Date dataEntrega) { this.dataEntrega = dataEntrega; }
+    public String getObservacao() { return observacao; }
+    public void setObservacao(String observacao) { this.observacao = observacao; }
+    public OrgaoFiscalizador getOrgaoFiscalizador() { return orgaoFiscalizador; }
+    public void setOrgaoFiscalizador(OrgaoFiscalizador orgaoFiscalizador) { this.orgaoFiscalizador = orgaoFiscalizador; }
+    public OrgaoDonatario getOrgaoDonatario() { return orgaoDonatario; }
+    public void setOrgaoDonatario(OrgaoDonatario orgaoDonatario) { this.orgaoDonatario = orgaoDonatario; }
+    public List<Produto> getProdutos() { return produtos; }
+    public void setProdutos(List<Produto> produtos) { this.produtos = produtos; }
+}
