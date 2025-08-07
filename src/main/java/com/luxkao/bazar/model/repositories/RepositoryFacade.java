@@ -1,5 +1,6 @@
 package com.luxkao.bazar.model.repositories;
 
+import com.luxkao.bazar.model.entities.Lote;
 import com.luxkao.bazar.model.entities.OrgaoDonatario;
 import com.luxkao.bazar.model.entities.OrgaoFiscalizador;
 import com.luxkao.bazar.model.entities.Produto;
@@ -15,11 +16,13 @@ public class RepositoryFacade {
     private final OrgaoFiscalizadorRepository ofRepo;
     private final OrgaoDonatarioRepository odRepo;
     private final ProdutoRepository pRepo;
+    private final LoteRepository loteRepo;
 
     private RepositoryFacade() {
         this.ofRepo = new OrgaoFiscalizadorRepository();
         this.odRepo = new OrgaoDonatarioRepository();
         this.pRepo = new ProdutoRepository();
+        this.loteRepo = new LoteRepository();
     }
 
     public static RepositoryFacade getCurrentInstance() {
@@ -78,5 +81,16 @@ public class RepositoryFacade {
     }
     public List<Produto> readAllProdutos() throws SQLException {
         return this.pRepo.readAll();
+    }
+    public List<Produto> readAllAvailableProdutos() throws SQLException {
+        return this.pRepo.readAllAvailable();
+    }
+
+    // Métodos para Lote
+    public void createLote(Lote lote) throws SQLException {
+        this.loteRepo.create(lote);
+    }
+    public List<Lote> readAllLotes() throws SQLException {
+        return this.loteRepo.readAll();
     }
 }

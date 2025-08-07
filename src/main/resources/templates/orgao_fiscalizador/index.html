@@ -7,8 +7,9 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
+<div th:replace="~{fragments/menu :: main-menu}"></div>
 <div class="container mt-4">
-    <h1>Órgãos Fiscalizadores</h1>
+    <h2>Órgãos Fiscalizadores</h2>
 
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>

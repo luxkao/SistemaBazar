@@ -1,15 +1,21 @@
 package com.luxkao.bazar.model.entities;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class Lote {
     private int id;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date dataEntrega;
     private String observacao;
     private OrgaoFiscalizador orgaoFiscalizador;
     private OrgaoDonatario orgaoDonatario;
-    private List<Produto> produtos;
+
+    private List<Produto> produtos = new ArrayList<>();
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }

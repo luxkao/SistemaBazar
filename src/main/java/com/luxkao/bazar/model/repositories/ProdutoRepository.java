@@ -75,4 +75,16 @@ public class ProdutoRepository implements Repository<Integer, Produto> {
         p.setDescricao(rs.getString("descricao"));
         return p;
     }
+
+    public List<Produto> readAllAvailable() throws SQLException {
+        String sql = "SELECT * FROM produto WHERE id_lote IS NULL";
+        List<Produto> produtos = new ArrayList<>();
+        try (PreparedStatement pstm = ConnectionManager.getCurrentConnection().prepareStatement(sql);
+             ResultSet rs = pstm.executeQuery()) {
+            while (rs.next()) {
+                produtos.add(buildProduto(rs));
+            }
+        }
+        return produtos;
+    }
 }
