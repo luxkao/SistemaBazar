@@ -5,6 +5,7 @@ import com.luxkao.bazar.model.entities.OrgaoDonatario;
 import com.luxkao.bazar.model.entities.OrgaoFiscalizador;
 import com.luxkao.bazar.model.entities.Produto;
 import com.luxkao.bazar.model.repositories.RepositoryFacade;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +22,18 @@ public class LoteController {
     private final RepositoryFacade facade = RepositoryFacade.getCurrentInstance();
 
     @GetMapping
-    public String index(Model model){
+    public String index(Model model,
+                        @RequestParam(name="fiscalizador", required = false) Integer fiscalizadorId,
+                        @RequestParam(name="donatario", required = false) Integer donatarioId){
         try {
-            model.addAttribute("lotes", facade.readAllLotes());
+            model.addAttribute("lotes", facade.readAllLotes(fiscalizadorId, donatarioId));
+
+            model.addAttribute("orgaosFiscalizadores", facade.readAllOrgaosFiscalizadores());
+            model.addAttribute("orgaosDonatarios", facade.readAllOrgaosDonatarios());
+
+            model.addAttribute("filtroFiscalizador", fiscalizadorId);
+            model.addAttribute("filtroDonatario", donatarioId);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -59,5 +69,20 @@ public class LoteController {
             redirectAttributes.addFlashAttribute("error", "Erro ao cadastrar Lote!");
         }
         return "redirect:/lotes";
+    }
+
+    @GetMapping("/{id}")
+    @ResponseBody
+    public ResponseEntity<?> getLoteById(@PathVariable("id") int id) {
+        try {
+            Lote lote = facade.readLote(id);
+            if (lote != null) {
+                return ResponseEntity.ok(lote);
+            }
+            return ResponseEntity.notFound().build();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Erro ao buscar o lote.");
+        }
     }
 }

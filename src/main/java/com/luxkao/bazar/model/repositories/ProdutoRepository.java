@@ -68,7 +68,7 @@ public class ProdutoRepository implements Repository<Integer, Produto> {
         return produtos;
     }
 
-    private Produto buildProduto(ResultSet rs) throws SQLException {
+    public Produto buildProduto(ResultSet rs) throws SQLException {
         Produto p = new Produto();
         p.setCodigo(rs.getInt("codigo"));
         p.setNome(rs.getString("nome"));

@@ -9,8 +9,39 @@
 <body>
 <div th:replace="~{fragments/menu :: main-menu}"></div>
 <div class="container mt-4">
-    <h2>Gestão de Lotes de Doação</h2>
-    <a href="/lotes/cadastro" class="btn btn-primary mb-3">Registrar Novo Lote</a>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Gestão de Lotes de Doação</h2>
+        <a href="/lotes/cadastro" class="btn btn-primary">Registrar Novo Lote</a>
+    </div>
+
+    <form th:action="@{/lotes}" method="get" class="card p-3 mb-4">
+        <div class="row">
+            <div class="col-md-5">
+                <label for="fiscalizador" class="form-label">Filtrar por Órgão Fiscalizador:</label>
+                <select id="fiscalizador" name="fiscalizador" class="form-select">
+                    <option value="">Todos</option>
+                    <option th:each="of : ${orgaosFiscalizadores}"
+                            th:value="${of.id}"
+                            th:text="${of.nome}"
+                            th:selected="${filtroFiscalizador != null && filtroFiscalizador == of.id}"></option>
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label for="donatario" class="form-label">Filtrar por Órgão Donatário:</label>
+                <select id="donatario" name="donatario" class="form-select">
+                    <option value="">Todos</option>
+                    <option th:each="od : ${orgaosDonatarios}"
+                            th:value="${od.id}"
+                            th:text="${od.nome}"
+                            th:selected="${filtroDonatario != null && filtroDonatario == od.id}"></option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-success w-100">Filtrar</button>
+            </div>
+        </div>
+    </form>
+
     <table class="table table-striped table-bordered">
         <thead class="table-dark">
         <tr>
@@ -18,7 +49,7 @@
             <th>Data de Entrega</th>
             <th>Órgão Fiscalizador</th>
             <th>Órgão Donatário</th>
-            <th>Obs.</th>
+            <th>Ações</th>
         </tr>
         </thead>
         <tbody>
@@ -27,10 +58,94 @@
             <td th:text="${#dates.format(lote.dataEntrega, 'dd/MM/yyyy')}"></td>
             <td th:text="${lote.orgaoFiscalizador.nome}"></td>
             <td th:text="${lote.orgaoDonatario.nome}"></td>
-            <td th:text="${lote.observacao}"></td>
+            <td>
+                <button type="button" class="btn btn-sm btn-info view-products-btn"
+                        th:data-lote-id="${lote.id}"
+                        data-bs-toggle="modal" data-bs-target="#produtosModal">
+                    Ver Detalhes
+                </button>
+            </td>
         </tr>
         </tbody>
     </table>
 </div>
+
+<div class="modal fade" id="produtosModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="produtosModalLabel">Detalhes do Lote</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="loteDescricao" class="mb-3"></div>
+                <h6>Produtos:</h6>
+                <ul id="listaDeProdutos" class="list-group">
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const viewButtons = document.querySelectorAll('.view-products-btn');
+        const modalBody = document.getElementById('listaDeProdutos');
+        const modalTitle = document.getElementById('produtosModalLabel');
+        const loteDescricaoDiv = document.getElementById('loteDescricao');
+
+        viewButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const loteId = this.getAttribute('data-lote-id');
+                modalTitle.textContent = 'Detalhes do Lote ' + loteId;
+
+                modalBody.innerHTML = '<li class="list-group-item">Carregando...</li>';
+                loteDescricaoDiv.innerHTML = '';
+
+                fetch(`/lotes/${loteId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Falha na rede ou no servidor.');
+                        }
+                        return response.json();
+                    })
+                    .then(lote => {
+                        modalBody.innerHTML = '';
+
+                        if(lote.observacao && lote.observacao.trim() !== ''){
+                            loteDescricaoDiv.innerHTML = `<p class="mb-2"><strong>Observação:</strong></p><p>${lote.observacao}</p><hr>`;
+                        } else {
+                            loteDescricaoDiv.innerHTML = '';
+                        }
+
+                        if (lote.produtos && lote.produtos.length > 0) {
+                            lote.produtos.forEach(produto => {
+                                const listItem = document.createElement('li');
+                                listItem.className = 'list-group-item';
+                                listItem.textContent = `${produto.codigo}: ${produto.nome}`;
+                                modalBody.appendChild(listItem);
+                            });
+                        } else {
+                            const listItem = document.createElement('li');
+                            listItem.className = 'list-group-item';
+                            listItem.textContent = 'Nenhum produto encontrado para este lote.';
+                            modalBody.appendChild(listItem);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar detalhes do lote:', error);
+                        loteDescricaoDiv.innerHTML = '';
+                        modalBody.innerHTML = '<li class="list-group-item text-danger">Não foi possível carregar os detalhes.</li>';
+                    });
+            });
+        });
+    });
+</script>
+
 </body>
 </html>

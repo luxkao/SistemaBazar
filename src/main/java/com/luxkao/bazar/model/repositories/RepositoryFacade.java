@@ -90,7 +90,10 @@ public class RepositoryFacade {
     public void createLote(Lote lote) throws SQLException {
         this.loteRepo.create(lote);
     }
-    public List<Lote> readAllLotes() throws SQLException {
-        return this.loteRepo.readAll();
+    public List<Lote> readAllLotes(Integer fiscalizadorId, Integer donatarioId) throws SQLException {
+        return this.loteRepo.readAll(fiscalizadorId, donatarioId);
+    }
+    public Lote readLote(int id) throws SQLException {
+        return this.loteRepo.read(id);
     }
 }
